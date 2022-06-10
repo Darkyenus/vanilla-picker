@@ -26,7 +26,7 @@ function onKey(bucket, target, keys, handler, stop) {
             }
             handler(e);
         }
-    });
+    }, { passive: false });
 }
 
 
@@ -198,7 +198,7 @@ class Picker {
             //Keep openHandler() pluggable, but call it in the right context:
             const openProxy = (e) => this.openHandler(e);
 
-            this._events.add(parent, 'click', openProxy);
+            this._events.add(parent, 'click', openProxy, { passive: false });
 
             //Keyboard navigation: Open on [Space] or [Enter] (but stop the event to avoid typing a " " in the editor textbox).
             //No, don't stop the event, as that would disable normal input behavior (typing a " " or clicking the Ok button with [Enter]).
@@ -400,7 +400,7 @@ class Picker {
         
         
         //Prevent clicks while dragging from bubbling up to the parent:
-        addEvent(dom, 'click', e => e.preventDefault());
+        addEvent(dom, 'click', e => e.preventDefault(), { passive: false });
 
 
         /* Draggable color selection */
@@ -424,7 +424,7 @@ class Picker {
         /*if(this.settings.editor)*/ {
             addEvent(editInput, 'input', function(e) {
                 that._setColor(this.value, { fromEditor: true, failSilently: true });
-            });
+            }, { passive: true });
             //Select all text on focus:
             addEvent(editInput, 'focus', function(e) {
                 const input = this;
@@ -432,7 +432,7 @@ class Picker {
                 if(input.selectionStart === input.selectionEnd) {
                     input.select();
                 }
-            });
+            }, { passive: true });
         }
 
 
@@ -440,12 +440,12 @@ class Picker {
 
         //onClose:
         this._ifPopup(() => {
-            addEvent(dom, 'blur', (e) => { that._closeTimeoutId = setTimeout(() => that.closeHandler(false), 0); }, true);
-            addEvent(dom, 'focus', (e) => clearTimeout(that._closeTimeoutId), true);
-            onKey(events, dom, ['Esc', 'Escape'], () => that.closeHandler(true));
+            addEvent(dom, 'blur', () => { that._closeTimeoutId = setTimeout(() => that.closeHandler(false), 0); },{ passive: true, capture: true });
+            addEvent(dom, 'focus', () => clearTimeout(that._closeTimeoutId), { passive: true, capture: true });
+            onKey(events, dom, ['Esc', 'Escape'], () => that.closeHandler(true), { passive: true });
             
             //Cancel button:
-            addEvent(this._domCancel, 'click', () => that.closeHandler(true));
+            addEvent(this._domCancel, 'click', () => that.closeHandler(true), { passive: true });
         });
 
         //onDone:
@@ -453,7 +453,7 @@ class Picker {
             that._ifPopup(() => that.closeHandler(true));
             if (that.onDone) { that.onDone(that.color); }
         };
-        addEvent(this._domOkay, 'click',   onDoneProxy);
+        addEvent(this._domOkay, 'click',   onDoneProxy, { passive: true });
         onKey(events, dom,      ['Enter'], onDoneProxy);
     }
 

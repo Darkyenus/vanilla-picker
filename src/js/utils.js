@@ -94,13 +94,13 @@ function dragTrack(eventBucket, area, callback) {
     //  https://stackoverflow.com/a/51750458/1869660
     //  "Mouse moves = *hover* like behavior. Touch moves = *drags* like behavior"
     //
-    eventBucket.add(area,   'mousedown',   function(e) { onMouse(e, true); });
-    eventBucket.add(area,   'touchstart',  function(e) { onTouch(e, true); });
-    eventBucket.add(window, 'mousemove',   onMouse);
-    eventBucket.add(area,   'touchmove',   onTouch);
-    eventBucket.add(window, 'mouseup',     function(e) { dragging = false; });
-    eventBucket.add(area,   'touchend',    function(e) { dragging = false; });
-    eventBucket.add(area,   'touchcancel', function(e) { dragging = false; });
+    eventBucket.add(area,   'mousedown',   function(e) { onMouse(e, true); }, { passive: false });
+    eventBucket.add(area,   'touchstart',  function(e) { onTouch(e, true); }, { passive: false });
+    eventBucket.add(window, 'mousemove',   onMouse, { passive: false });
+    eventBucket.add(area,   'touchmove',   onTouch, { passive: false });
+    eventBucket.add(window, 'mouseup',     function(e) { dragging = false; }, { passive: true });
+    eventBucket.add(area,   'touchend',    function(e) { dragging = false; }, { passive: true });
+    eventBucket.add(area,   'touchcancel', function(e) { dragging = false; }, { passive: true });
 }
 
 
