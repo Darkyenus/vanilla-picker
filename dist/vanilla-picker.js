@@ -468,21 +468,21 @@
 
       eventBucket.add(area, 'mousedown', function (e) {
           onMouse(e, true);
-      });
+      }, { passive: false });
       eventBucket.add(area, 'touchstart', function (e) {
           onTouch(e, true);
-      });
-      eventBucket.add(window, 'mousemove', onMouse);
-      eventBucket.add(area, 'touchmove', onTouch);
+      }, { passive: false });
+      eventBucket.add(window, 'mousemove', onMouse, { passive: false });
+      eventBucket.add(area, 'touchmove', onTouch, { passive: false });
       eventBucket.add(window, 'mouseup', function (e) {
           dragging = false;
-      });
+      }, { passive: true });
       eventBucket.add(area, 'touchend', function (e) {
           dragging = false;
-      });
+      }, { passive: true });
       eventBucket.add(area, 'touchcancel', function (e) {
           dragging = false;
-      });
+      }, { passive: true });
   }
 
   var BG_TRANSP = 'linear-gradient(45deg, lightgrey 25%, transparent 25%, transparent 75%, lightgrey 75%) 0 0 / 2em 2em,\n                   linear-gradient(45deg, lightgrey 25%,       white 25%,       white 75%, lightgrey 75%) 1em 1em / 2em 2em';
@@ -504,7 +504,7 @@
               }
               handler(e);
           }
-      });
+      }, { passive: false });
   }
 
   var Picker = function () {
@@ -603,7 +603,7 @@
                       return _this.openHandler(e);
                   };
 
-                  this._events.add(parent, 'click', openProxy);
+                  this._events.add(parent, 'click', openProxy, { passive: false });
 
                   onKey(this._events, parent, [' ', 'Spacebar', 'Enter'], openProxy);
 
@@ -779,7 +779,7 @@
 
               addEvent(dom, 'click', function (e) {
                   return e.preventDefault();
-              });
+              }, { passive: false });
 
               dragTrack(events, this._domH, function (x, y) {
                   return that._setHSLA(x);
@@ -799,7 +799,7 @@
               {
                   addEvent(editInput, 'input', function (e) {
                       that._setColor(this.value, { fromEditor: true, failSilently: true });
-                  });
+                  }, { passive: true });
 
                   addEvent(editInput, 'focus', function (e) {
                       var input = this;
@@ -807,25 +807,25 @@
                       if (input.selectionStart === input.selectionEnd) {
                           input.select();
                       }
-                  });
+                  }, { passive: true });
               }
 
               this._ifPopup(function () {
-                  addEvent(dom, 'blur', function (e) {
+                  addEvent(dom, 'blur', function () {
                       that._closeTimeoutId = setTimeout(function () {
                           return that.closeHandler(false);
                       }, 0);
-                  }, true);
-                  addEvent(dom, 'focus', function (e) {
+                  }, { passive: true, capture: true });
+                  addEvent(dom, 'focus', function () {
                       return clearTimeout(that._closeTimeoutId);
-                  }, true);
+                  }, { passive: true, capture: true });
                   onKey(events, dom, ['Esc', 'Escape'], function () {
                       return that.closeHandler(true);
-                  });
+                  }, { passive: true });
 
                   addEvent(_this2._domCancel, 'click', function () {
                       return that.closeHandler(true);
-                  });
+                  }, { passive: true });
               });
 
               var onDoneProxy = function onDoneProxy(e) {
@@ -836,7 +836,7 @@
                       that.onDone(that.color);
                   }
               };
-              addEvent(this._domOkay, 'click', onDoneProxy);
+              addEvent(this._domOkay, 'click', onDoneProxy, { passive: true });
               onKey(events, dom, ['Enter'], onDoneProxy);
           }
       }, {
